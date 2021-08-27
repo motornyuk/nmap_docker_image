@@ -1,7 +1,6 @@
 #!/bin/bash
 #
 
-
 # Docker server
 docker_server="docker.io"
 
@@ -26,6 +25,12 @@ logger() {
     printf "$(timestamp) - $1\n" >> $log
 }
 
+# Exception Catcher
+except () {
+    logger $1
+    return 1
+}
+
 # Assign timestamp to ensure var is a static point in time.
 declare -r timestp=$(timestamp)
 logger "Starting Build. Timestamp: $timestp\n"
@@ -35,26 +40,26 @@ function build() {
   local cmd
   cmd="docker build . -t docker.io/${docker_repo}:$timestp >> $log"
   logger "Running Docker Build Command: \"$cmd\""
-  docker build . -t "${docker_server}"/"${docker_repo}":$timestp >> $log || logger "Error! docker build failed"
+  docker build . -t "${docker_server}"/"${docker_repo}":$timestp >> $log || except "Error! docker build failed"
 }
 
 # Push to github - Triggers builds in github and Dockerhub.
 function git() {
   git="/usr/bin/git -C ./"
-  $git -C './' pull git@github.com:"${gitlab_repo}" >> $log || { echo "git pull failed!"; exit 1; }
-  $git add --all >> $log || { echo "git add failed!"; exit 1; }
-  $git commit -a -m 'Automatic build '$timestp >> $log || { echo "git commit failed!"; exit 1; }
-  $git push >> $log || { echo "git push failed!"; exit 1; }
+  $git -C './' pull git@github.com:"${gitlab_repo}" >> $log || except "git pull failed!"
+  $git add --all >> $log || except "git add failed!"
+  $git commit -a -m 'Automatic build '$timestp >> $log || except "git commit failed!"
+  $git push >> $log || except "git push failed!"
 } 
 
 # Push the new tag to Dockerhub.
 function docker_push() {
   echo "Pushing ${docker_repo}:$timestp..."
-  docker push "${docker_repo}":$timestp >> $log || { echo "docker image ${docker_repo}:$timestp push failed!"; exit 1; }
+  docker push "${docker_repo}":$timestp >> $log || except "docker image ${docker_repo}:$timestp push failed!"
   echo "Tagging ${docker_repo}:$timestp..."
-  docker tag "${docker_repo}":$timestp docker.io/"${docker_repo}":latest >> $log || { echo "docker image ${docker_repo}:$timestp tag failed!"; exit 1; }
+  docker tag "${docker_repo}":$timestp docker.io/"${docker_repo}":latest >> $log || except "docker image ${docker_repo}:$timestp tag failed!"
   echo "Pushing ${docker_repo}:latest..."
-  docker push "${docker_repo}":latest >> $log || { echo "docker image ${docker_repo}:latest push failed!"; exit 1; }
+  docker push "${docker_repo}":latest >> $log || except "docker image ${docker_repo}:latest push failed!"
 }
 
 # Prune the git tree in the local dir
