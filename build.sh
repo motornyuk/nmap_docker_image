@@ -57,7 +57,7 @@ function docker_push() {
   echo "Pushing ${docker_repo}:$timestp..."
   docker push "${docker_repo}":$timestp >> $log || except "docker image ${docker_repo}:$timestp push failed!"
   echo "Tagging ${docker_repo}:$timestp..."
-  docker tag "${docker_repo}":$timestp docker.io/"${docker_repo}":latest >> $log || except "docker image ${docker_repo}:$timestp tag failed!"
+  docker tag "${docker_repo}":$timestp "${docker_server}"/"${docker_repo}":latest >> $log || except "docker image ${docker_repo}:$timestp tag failed!"
   echo "Pushing ${docker_repo}:latest..."
   docker push "${docker_repo}":latest >> $log || except "docker image ${docker_repo}:latest push failed!"
 }
@@ -65,7 +65,7 @@ function docker_push() {
 # Prune the git tree in the local dir
 function prune() {
   logger "Running git gc --prune"
-  /usr/bin/git gc --prune 
+  /usr/bin/git gc --prune
 }
 
 
