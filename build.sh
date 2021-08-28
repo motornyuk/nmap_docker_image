@@ -10,6 +10,9 @@ docker_repo="motornyuk/nmap"
 # GiHub repo
 gitlab_repo="motornyuk/nmap_docker_image.git"
 
+# App version
+app_version="7.92"
+
 # Log file
 declare -r log="./log_build.log"
 cat /dev/null > $log
@@ -33,14 +36,14 @@ except () {
 
 # Assign timestamp to ensure var is a static point in time.
 declare -r timestp=$(timestamp)
-logger "Starting Build. Timestamp: $timestp\n"
+logger "Starting Build. Timestamp: ${timestp}\n"
 
 # Build the image using timestamp as tag.
 function build() {
   local cmd
-  cmd="docker build . -t docker.io/${docker_repo}:$timestp >> $log"
+  cmd="docker build . -t ${docker_server}/${docker_repo}:${app_version} >> $log"
   logger "Running Docker Build Command: \"$cmd\""
-  docker build . -t "${docker_server}"/"${docker_repo}":$timestp >> $log || except "Error! docker build failed"
+  docker build . -t "${docker_server}"/"${docker_repo}":"${app_version}" >> $log || except "Error! docker build failed"
 }
 
 # Push to github - Triggers builds in github and Dockerhub.
@@ -48,16 +51,16 @@ function git() {
   git="/usr/bin/git -C ./"
   $git -C './' pull git@github.com:"${gitlab_repo}" >> $log || except "git pull failed!"
   $git add --all >> $log || except "git add failed!"
-  $git commit -a -m 'Automatic build '$timestp >> $log || except "git commit failed!"
+  $git commit -a -m 'Automatic build '${app_version} >> $log || except "git commit failed!"
   $git push >> $log || except "git push failed!"
 } 
 
 # Push the new tag to Dockerhub.
 function docker_push() {
-  echo "Pushing ${docker_repo}:$timestp..."
-  docker push "${docker_repo}":$timestp >> $log || except "docker image ${docker_repo}:$timestp push failed!"
-  echo "Tagging ${docker_repo}:$timestp..."
-  docker tag "${docker_repo}":$timestp "${docker_server}"/"${docker_repo}":latest >> $log || except "docker image ${docker_repo}:$timestp tag failed!"
+  echo "Pushing ${docker_repo}:${app_version}..."
+  docker push "${docker_repo}:${app_version}" >> $log || except "docker image ${docker_repo}:${app_version} push failed!"
+  echo "Tagging ${docker_repo}:${app_version}..."
+  docker tag "${docker_repo}:${app_version}" "${docker_server}"/"${docker_repo}":latest >> $log || except "docker image ${docker_repo}:${app_version} tag failed!"
   echo "Pushing ${docker_repo}:latest..."
   docker push "${docker_repo}":latest >> $log || except "docker image ${docker_repo}:latest push failed!"
 }
