@@ -52,7 +52,6 @@ COPY --from=0 /usr/share/nmap/nmap /usr/bin/nmap
 COPY --from=0 /etc/hosts /etc/hosts
 COPY --from=0 /etc/passwd /etc/passwd
 COPY --from=0 /etc/group /etc/group
-COPY --from=0 /etc/ssl/openssl.cnf /etc/ssl/openssl.cnf
 COPY --from=0 /usr/local/share/nmap/ /usr/local/share/nmap/
 COPY --from=0 /usr/share/nmap /usr/share/nmap 
 COPY --from=0 /usr/lib/ /usr/lib/
