@@ -14,7 +14,7 @@ git_server="git@github.com"
 git_repo="motornyuk/nmap_docker_image.git"
 
 # App version
-app_version="7.92-1"
+app_version="7.92"
 
 # Log file
 declare -r log="./log_build.log"

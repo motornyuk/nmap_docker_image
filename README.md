@@ -3,7 +3,7 @@
 - Lean and up-to-date.
 - CI/CD built, monitored and maintained.
 - Compiled fresh from latest stable source: 
- https://nmap.org/dist/nmap-7.92-1.tgz
+ https://nmap.org/dist/nmap-7.92.tgz
 - Clean, scratch-built image.
 - Single concern container.
 
