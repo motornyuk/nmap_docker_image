@@ -1,4 +1,4 @@
-# 'Version: 7.92'
+# 'Version: 7.92-1'
 
 FROM alpine:latest
 RUN apk update && apk upgrade && \
@@ -37,7 +37,7 @@ RUN apk search openssl && apk add openssl-d-dev || echo "Could not add openssl-d
 
 RUN rm -f /var/cache/apk/*
 
-RUN wget "https://nmap.org/dist/nmap-7.92.tgz"
+RUN wget "https://nmap.org/dist/nmap-7.92-1.tgz"
 
 RUN tar -zxvf ./nmap* && \
     rm -rf './nmap*.tgz' && \
